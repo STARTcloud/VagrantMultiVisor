@@ -1,0 +1,28 @@
+---
+-
+  become: true
+  gather_facts: true
+  hosts: all
+  vars:
+    ansible_ssh_pipelining: "{{ rv.ansible_ssh_pipelining }}"
+  pre_tasks:
+    - 
+      name: "Writing current variables to /vagrant/ansible/running_var.out"
+      copy:
+        content: "{{ vars }}"
+        dest: "/vagrant/ansible/running_var.out"
+        force: no
+        mode: 'a+x'
+    -
+      name: "Creating Directories"
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: 0777
+        recurse: yes
+      with_items:
+        - "/vagrant/completed"
+        - "/root/.ansible/tmp"
+  roles:
+    -
+      role: hostname
