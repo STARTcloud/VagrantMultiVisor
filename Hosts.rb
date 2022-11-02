@@ -6,6 +6,7 @@ class Hosts
 
     ## Load your Secrets file
     secrets = YAML::load(File.read("#{File.dirname(__FILE__)}/.secrets.yml")) if File.exists?("#{File.dirname(__FILE__)}/.secrets.yml")
+
     # Main loop to configure VM
     settings['hosts'].each_with_index do |host, index|
       provider = host['provider-type']
@@ -38,8 +39,6 @@ class Hosts
         ## Note Do not place two IPs in the same subnet on both nics at the same time, They must be different subnets or on a different network segment(ie VLAN, physical seperation for Linux VMs)
         if host.has_key?('networks')
           host['networks'].each_with_index do |network, netindex|
-              current_mac = network['mac']
-              current_mac = network['mac'].delete! ":" if host['provider-type'] == 'virtualbox'
               server.vm.network "public_network", ip: network['address'], dhcp: network['dhcp4'], dhcp6: network['dhcp6'], bridge: network['bridge'], auto_config: false, :netmask => network['netmask'], :mac => network['mac'], gateway: network['gateway'], nictype: network['type'], nic_number: netindex, managed: network['is_control'], vlan: network['vlan'], use_dhcp_assigned_default_route: true if network['type'] == 'external'
               server.vm.network "private_network", ip: network['address'], dhcp: network['dhcp4'], dhcp6: network['dhcp6'], bridge: network['bridge'], auto_config: false, :netmask => network['netmask'], :mac => network['mac'], gateway: network['gateway'], nictype: network['type'], nic_number: netindex, managed: network['is_control'], vlan: network['vlan'] if network['type'] == 'host'
           end
