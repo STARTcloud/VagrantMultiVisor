@@ -1,0 +1,20 @@
+---
+-
+  name: "Setting hostname"
+  hostname:
+    name: "{{ subdomain }}.{{ domain }}"
+
+- 
+  name: "Displaying the config"
+  debug:
+    msg: "The hostname is {{ subdomain }}.{{ domain }} and the OS is {{ ansible_version }}"
+
+- 
+  name: "Setting /etc/hosts"
+  replace:
+    path: "/etc/hosts"
+    regexp: "{{ item.regex }}"
+    replace: "{{ item.replace }}"
+  with_items:
+    - { regex: "(^127.0.0.1)(.*)$", replace: '127.0.0.1   localhost {{ subdomain }}.{{ domain }} {{ subdomain }}'}
+    - { regex: "(^127.0.1.1)(.*)$", replace: '127.0.1.1   localhost {{ subdomain }}.{{ domain }} {{ subdomain }}'}
